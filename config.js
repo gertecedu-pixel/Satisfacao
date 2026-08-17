@@ -1,5 +1,5 @@
 // Substitua pela URL /exec da implantação do Google Apps Script.
-const APPS_SCRIPT_URL = 'COLE_AQUI_A_URL_DO_WEB_APP';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwT3VSnPGH-H1wA4OPP2SilNemhDTQ9oyb6bF7He3DGRcMCS460_UbaLz7I3mFlPdI/exec';
 
 const UNIDADES = [
   'SENAI Campo Grande',
