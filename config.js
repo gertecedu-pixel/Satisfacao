@@ -29,26 +29,32 @@ const UNIDADES = [
 
 
 // ============================================================
-// PREENCHE SELECT COM AS UNIDADES
+// PREENCHE O SELECT DAS UNIDADES
 // ============================================================
 
 function preencherUnidades(selectId) {
 
-  const el = document.getElementById(selectId);
+  const select = document.getElementById(selectId);
 
-  if (!el) {
-    console.warn(`Select não encontrado: ${selectId}`);
+  if (!select) {
+    console.warn(
+      'Select de unidades não encontrado:',
+      selectId
+    );
     return;
   }
 
+
   UNIDADES.forEach(unidade => {
 
-    const option = document.createElement('option');
+    const option =
+      document.createElement('option');
 
     option.value = unidade;
+
     option.textContent = unidade;
 
-    el.appendChild(option);
+    select.appendChild(option);
 
   });
 
@@ -56,36 +62,61 @@ function preencherUnidades(selectId) {
 
 
 // ============================================================
-// EXIBE CAMPO "OUTRO" QUANDO NECESSÁRIO
+// CAMPO "OUTRO"
 // ============================================================
 
 function bindOutro(selectId, inputId) {
 
-  const select = document.getElementById(selectId);
-  const input = document.getElementById(inputId);
+  const select =
+    document.getElementById(selectId);
+
+  const input =
+    document.getElementById(inputId);
+
 
   if (!select || !input) {
+
     console.warn(
-      `Não foi possível configurar o campo Outro: ${selectId} / ${inputId}`
+      'Não foi possível configurar o campo Outro:',
+      selectId,
+      inputId
     );
+
     return;
+
   }
+
 
   const sincronizar = () => {
 
-    const selecionouOutro = select.value === 'Outro';
+    const selecionouOutro =
+      select.value === 'Outro';
 
-    input.style.display = selecionouOutro ? 'block' : 'none';
 
-    input.required = selecionouOutro;
+    input.style.display =
+      selecionouOutro
+        ? 'block'
+        : 'none';
+
+
+    input.required =
+      selecionouOutro;
+
 
     if (!selecionouOutro) {
+
       input.value = '';
+
     }
 
   };
 
-  select.addEventListener('change', sincronizar);
+
+  select.addEventListener(
+    'change',
+    sincronizar
+  );
+
 
   sincronizar();
 
@@ -96,31 +127,53 @@ function bindOutro(selectId, inputId) {
 // CAMPOS CONDICIONAIS
 // ============================================================
 
-function toggleConditional(sourceName, testFn, targetId) {
+function toggleConditional(
+  sourceName,
+  testFn,
+  targetId
+) {
 
-  const target = document.getElementById(targetId);
+  const target =
+    document.getElementById(targetId);
+
 
   if (!target) {
-    console.warn(`Campo condicional não encontrado: ${targetId}`);
+
+    console.warn(
+      'Campo condicional não encontrado:',
+      targetId
+    );
+
     return;
+
   }
+
 
   const sincronizar = () => {
 
-    const checked = document.querySelector(
-      `[name="${sourceName}"]:checked`
-    );
+    const checked =
+      document.querySelector(
+        `[name="${sourceName}"]:checked`
+      );
+
 
     const mostrar =
-      checked && testFn(checked.value);
+      checked &&
+      testFn(checked.value);
+
 
     target.style.display =
-      mostrar ? 'block' : 'none';
+      mostrar
+        ? 'block'
+        : 'none';
 
   };
 
+
   document
-    .querySelectorAll(`[name="${sourceName}"]`)
+    .querySelectorAll(
+      `[name="${sourceName}"]`
+    )
     .forEach(elemento => {
 
       elemento.addEventListener(
@@ -130,165 +183,208 @@ function toggleConditional(sourceName, testFn, targetId) {
 
     });
 
+
   sincronizar();
 
 }
 
 
 // ============================================================
-// ENVIO DOS FORMULÁRIOS
+// FUNÇÃO PRINCIPAL DE ENVIO
 // ============================================================
 
-async function enviarFormulario(form, tipo, statusId) {
+async function enviarFormulario(
+  form,
+  tipo,
+  statusId
+) {
 
-  const status = document.getElementById(statusId);
+  // ==========================================================
+  // ELEMENTOS DA TELA
+  // ==========================================================
 
-  const btn = form.querySelector(
-    'button[type="submit"]'
-  );
+  const status =
+    document.getElementById(statusId);
 
 
-  // ----------------------------------------------------------
-  // Limpa mensagens anteriores
-  // ----------------------------------------------------------
+  const btn =
+    form.querySelector(
+      'button[type="submit"]'
+    );
+
+
+  if (!status || !btn) {
+
+    console.error(
+      'Elemento de status ou botão não encontrado.'
+    );
+
+    return;
+
+  }
+
+
+  // ==========================================================
+  // EVITA DUPLO ENVIO
+  // ==========================================================
+
+  if (btn.disabled) {
+    return;
+  }
+
+
+  // ==========================================================
+  // LIMPA MENSAGEM ANTERIOR
+  // ==========================================================
 
   status.textContent = '';
 
   status.className = 'status';
 
 
-  // ----------------------------------------------------------
-  // Validação HTML
-  // ----------------------------------------------------------
+  // ==========================================================
+  // VALIDAÇÃO DOS CAMPOS HTML
+  // ==========================================================
 
   if (!form.reportValidity()) {
+
     return;
+
   }
 
 
-  // ----------------------------------------------------------
-  // Verifica configuração da URL
-  // ----------------------------------------------------------
+  // ==========================================================
+  // VALIDA URL DO APPS SCRIPT
+  // ==========================================================
 
   if (
     !APPS_SCRIPT_URL ||
-    APPS_SCRIPT_URL.includes('COLE_AQUI')
+    APPS_SCRIPT_URL.includes(
+      'COLE_AQUI'
+    )
   ) {
 
     status.textContent =
-      'Configure a URL do Apps Script em config.js.';
+      'URL do Apps Script não configurada.';
 
-    status.className = 'status err';
+    status.className =
+      'status err';
 
     return;
 
   }
 
 
-  // ----------------------------------------------------------
-  // Captura os dados do formulário
-  // ----------------------------------------------------------
+  // ==========================================================
+  // MONTA OS DADOS DO FORMULÁRIO
+  // ==========================================================
 
-  const data = Object.fromEntries(
-    new FormData(form).entries()
-  );
+  const data =
+    Object.fromEntries(
+      new FormData(form).entries()
+    );
 
 
-  // Identifica qual das três pesquisas está sendo enviada
+  // Identifica a pesquisa
   data.tipoPesquisa = tipo;
 
 
-  // Guarda de qual página veio a resposta
-  data.urlOrigem = window.location.href;
+  // Guarda a página de origem
+  data.urlOrigem =
+    window.location.href;
 
 
-  // ----------------------------------------------------------
-  // Bloqueia botão para evitar duplo clique
-  // ----------------------------------------------------------
+  // ==========================================================
+  // BLOQUEIA O BOTÃO
+  // ==========================================================
 
   btn.disabled = true;
 
-  btn.textContent = 'Enviando...';
+  btn.textContent =
+    'Enviando...';
+
+
+  status.textContent =
+    'Enviando sua resposta...';
+
+  status.className =
+    'status';
 
 
   try {
 
-    // --------------------------------------------------------
-    // ENVIO PARA GOOGLE APPS SCRIPT
-    // --------------------------------------------------------
+    // ========================================================
+    // ENVIA PARA O GOOGLE APPS SCRIPT
+    //
+    // no-cors:
+    // evita o erro de CORS provocado pelo redirecionamento
+    // do Google Apps Script / Googleusercontent
+    // ========================================================
 
-    const response = await fetch(
+    await fetch(
       APPS_SCRIPT_URL,
       {
 
         method: 'POST',
 
+        mode: 'no-cors',
+
         headers: {
+
           'Content-Type':
             'text/plain;charset=utf-8'
+
         },
 
-        body: JSON.stringify(data)
+        body:
+          JSON.stringify(data)
 
       }
     );
 
 
-    // --------------------------------------------------------
-    // LÊ RESPOSTA DO APPS SCRIPT
-    // --------------------------------------------------------
-
-    const out = await response.json();
-
-
-    console.log(
-      'Resposta do Apps Script:',
-      out
-    );
-
-
-    // --------------------------------------------------------
-    // VERIFICA SE O APPS SCRIPT CONFIRMOU O SALVAMENTO
-    //
-    // Apps Script retorna:
-    //
-    // {
-    //   success: true,
-    //   message: "Resposta salva com sucesso."
-    // }
-    // --------------------------------------------------------
-
-    if (!out.success) {
-
-      throw new Error(
-        out.message ||
-        'Falha ao salvar a resposta.'
-      );
-
-    }
-
-
-    // --------------------------------------------------------
+    // ========================================================
     // SUCESSO
-    // --------------------------------------------------------
+    //
+    // Com no-cors não conseguimos ler o JSON retornado.
+    // Portanto, se o fetch terminou sem lançar erro,
+    // consideramos o envio realizado.
+    // ========================================================
 
     status.textContent =
-      out.message ||
-      'Resposta registrada com sucesso. Obrigado!';
+      'Resposta enviada com sucesso. Obrigado!';
 
     status.className =
       'status ok';
 
 
-    // Limpa o formulário
+    // ========================================================
+    // LIMPA O FORMULÁRIO
+    // ========================================================
+
     form.reset();
+
+
+    // ========================================================
+    // REAPLICA CAMPOS "OUTRO", SE EXISTIREM
+    // ========================================================
+
+    document
+      .querySelectorAll('select')
+      .forEach(select => {
+
+        select.dispatchEvent(
+          new Event('change')
+        );
+
+      });
 
 
   } catch (erro) {
 
-    // --------------------------------------------------------
-    // ERRO
-    // --------------------------------------------------------
+    // ========================================================
+    // ERRO REAL DE ENVIO
+    // ========================================================
 
     console.error(
       'Erro ao enviar pesquisa:',
@@ -297,18 +393,18 @@ async function enviarFormulario(form, tipo, statusId) {
 
 
     status.textContent =
-      'Não foi possível registrar a resposta: ' +
-      erro.message;
+      'Não foi possível enviar a resposta. Tente novamente.';
 
     status.className =
       'status err';
 
+  }
 
-  } finally {
+  finally {
 
-    // --------------------------------------------------------
-    // LIBERA BOTÃO NOVAMENTE
-    // --------------------------------------------------------
+    // ========================================================
+    // LIBERA BOTÃO
+    // ========================================================
 
     btn.disabled = false;
 
