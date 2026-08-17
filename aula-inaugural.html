@@ -1,0 +1,22 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pesquisa de Aula Inaugural – SENAI MS</title><link rel="stylesheet" href="styles.css"></head><body><header class="top"><div class="brand">SENAI MS</div></header><main class="wrap"><section class="card hero"><h1>Pesquisa de Aula Inaugural – SENAI MS</h1><p>Bem-vindo ao SENAI MS! Antes de iniciar sua jornada, gostaríamos de conhecer um pouco sobre você.</p></section><form id="f" class="card">
+<div class="field"><label> Número do RA? (Registro Acadêmico) <span class="req">*</span></label><input class="input" name="ra" required></div>
+<div class="field"><label>Código da Turma? <span class="req">*</span><span class="hint">Ex.: TEC.256.PRE.001 ou QUA.366.PRE.002</span></label><input class="input" name="codigoTurma" required></div>
+<div class="field"><label>Qual sua Unidade Operacional/Escola? <span class="req">*</span><span class="hint">Se não tiver uma escola SENAI, selecione Outro e informe sua cidade.</span></label><select id="unidade" name="unidade" required><option value="">Selecione...</option></select><input id="outraUnidade" class="input" name="outraUnidade" placeholder="Informe sua cidade" style="display:none;margin-top:10px"></div>
+<div class="field"><span class="question">Qual é o seu nível de escolaridade atual? <span class="req">*</span></span><div class="options" id="escolaridade"></div></div>
+<div class="field"><span class="question">Qual é a renda mensal aproximada da sua família? <span class="req">*</span></span><div class="options" id="renda"></div></div>
+<div class="field"><span class="question">Qual é a sua situação de trabalho hoje? <span class="req">*</span></span><div class="options" id="trabalho"></div></div>
+<div class="field"><span class="question">Qual é o seu principal objetivo ao fazer este curso? <span class="req">*</span></span><div class="options" id="objetivo"></div></div>
+<div class="field"><span class="question">Você já trabalhou ou trabalha na área deste curso? <span class="req">*</span></span><div class="options" id="area"></div></div>
+<div class="field"><span class="question">Como você ficou sabendo deste curso no SENAI? <span class="req">*</span></span><div class="options" id="origem"></div></div>
+<div class="field"><span class="question">Em uma escala de 0 a 10, qual o seu nível de expectativa com este curso que está começando? <span class="req">*</span></span><div id="expectativa" class="scale"></div><div class="scale-notes"><span>Nenhuma expectativa</span><span>Expectativa altíssima</span></div></div>
+<button type="submit">Enviar pesquisa</button><div id="status" class="status"></div></form></main><script src="config.js"></script><script>
+const radios=(id,name,arr)=>{document.getElementById(id).innerHTML=arr.map((v,i)=>`<label class="option"><input type="radio" name="${name}" value="${v}" ${i===0?'required':''}> <span>${v}</span></label>`).join('')};
+radios('escolaridade','escolaridade',['Analfabeto','Fundamental incompleto','Fundamental completo','Ensino Médio incompleto','Ensino Médio completo','Superior incompleto','Superior completo']);
+radios('renda','renda',['Até 1 salário mínimo, até R$ 1.621,00','1 a 2 salários mínimos, de R$ 1.621,01 a R$ 3.242,00','2 a 3 salários mínimos de R$ 3.242,01 a R$ 4.863,00','3 a 5 salários mínimos de R$ 4.863,01 a R$ 8.105,00','Acima de 5 salários mínimos acima de R$ 8.105,00']);
+radios('trabalho','situacaoTrabalho',['Empregado','Desempregado','Autônomo','1° Emprego','Aposentado','Aprendiz com Contrato','Microempreendedor Individual MEI']);
+radios('objetivo','objetivoCurso',['Conseguir emprego','Crescer no emprego atual','Empreender','Obter uma certificação profissional','Outro']);
+radios('area','experienciaArea',['Sim, atualmente','Sim, já trabalhei anteriormente','Não, é uma área nova para mim']);
+radios('origem','comoSoube',['Indicação de alguém','Redes sociais','Google','Televisão ou Rádio','Empresa onde trabalho','Outro']);
+document.getElementById('expectativa').innerHTML=Array.from({length:11},(_,i)=>`<label><input type="radio" name="expectativaCurso" value="${i}" ${i===0?'required':''}>${i}</label>`).join('');
+preencherUnidades('unidade');bindOutro('unidade','outraUnidade');document.getElementById('f').addEventListener('submit',e=>{e.preventDefault();enviarFormulario(e.currentTarget,'AULA_INAUGURAL','status')});
+</script></body></html>
