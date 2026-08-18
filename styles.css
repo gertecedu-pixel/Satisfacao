@@ -293,3 +293,7 @@ button[type="submit"]:disabled{opacity:.65;cursor:not-allowed;transform:none}
   .hero{flex-direction:column;align-items:flex-start}
   .brand{align-items:flex-start;flex-direction:column}
 }
+
+/* Ajuste v3: cabeçalho apenas com a marca SENAI FIEMS */
+.brand{gap:0}
+.brand-logo{height:72px;max-width:360px}
