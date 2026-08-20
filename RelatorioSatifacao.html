@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Relatório de Satisfação – SENAI MS</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+:root{--blue:#154593;--orange:#ef5e31;--dark:#2c3e5c;--bg:#eef3f8;--card:#fff;--muted:#667085;--border:#dbe3ef;--shadow:0 12px 30px rgba(15,23,42,.10)}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,"Segoe UI",Arial,sans-serif;background:linear-gradient(180deg,#f7f9fc,#edf2f8);color:#1f2937;min-height:100vh}
+header{background:linear-gradient(135deg,var(--blue),#0f346f);color:#fff;padding:16px 24px;box-shadow:0 5px 20px rgba(21,69,147,.22)}
+.header-inner{max-width:1450px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.brand{display:flex;align-items:center;gap:14px}.brand img{height:52px;background:#fff;border-radius:10px;padding:6px 10px}.brand h1{font-size:22px;margin:0}.brand small{opacity:.85}
+.live{border:1px solid rgba(255,255,255,.25);padding:8px 12px;border-radius:999px;font-weight:700;font-size:13px}
+.wrap{max-width:1450px;margin:22px auto 44px;padding:0 18px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;background:#fff;padding:8px;border-radius:14px;box-shadow:var(--shadow);margin-bottom:16px}
+.tab{border:0;background:transparent;padding:11px 16px;border-radius:10px;font-weight:800;cursor:pointer;color:#475467}
+.tab.active{background:var(--blue);color:#fff}.tab[data-tab="satisfacao"].active{background:var(--orange)}.tab[data-tab="conclusao"].active{background:var(--dark)}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}.filters{display:flex;gap:8px;flex-wrap:wrap}
+select,input[type=search]{padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#fff;outline:none}
+button.action{border:0;border-radius:10px;padding:10px 14px;background:var(--blue);color:#fff;font-weight:800;cursor:pointer}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px}.kpi,.panel{background:var(--card);border:1px solid #e8edf5;border-radius:18px;box-shadow:var(--shadow)}
+.kpi{padding:18px}.kpi .label{font-size:13px;color:var(--muted);font-weight:700}.kpi .value{font-size:34px;font-weight:900;color:var(--blue);margin-top:4px}.kpi.orange .value{color:var(--orange)}.kpi.dark .value{color:var(--dark)}.kpi.green .value{color:#278a58}
+.panel{padding:18px}.panel h3{margin:0 0 12px;font-size:15px}
+.charts{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:14px;margin-bottom:14px}.chartbox{height:270px}
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.table-wrap{overflow:auto;max-height:430px;border:1px solid #e8edf5;border-radius:12px}table{width:100%;border-collapse:collapse;background:#fff;font-size:12px}
+th,td{padding:10px;border-bottom:1px solid #edf1f6;text-align:left;white-space:nowrap}th{position:sticky;top:0;background:#f6f8fb;z-index:2}
+.comments{display:grid;gap:8px;max-height:300px;overflow:auto}.comment{background:#f8fafc;border:1px solid #e8edf5;border-radius:10px;padding:10px;font-size:13px;line-height:1.4}
+.note,.status{font-size:12px;color:var(--muted)}.empty{text-align:center;padding:25px;color:var(--muted)}
+.loading{position:fixed;inset:0;background:rgba(255,255,255,.74);display:none;align-items:center;justify-content:center;z-index:50}.loading.show{display:flex}.loading div{background:#fff;padding:20px 26px;border-radius:14px;box-shadow:var(--shadow);font-weight:800;color:var(--blue)}
+@media(max-width:1050px){.kpis{grid-template-columns:repeat(2,1fr)}.charts,.twocol{grid-template-columns:1fr}}
+@media(max-width:620px){.kpis{grid-template-columns:1fr}.brand img{height:42px}.live{display:none}}
+</style>
+</head>
+<body>
+<header><div class="header-inner"><div class="brand"><img src="logo-senai-fiems.png" alt="SENAI FIEMS" onerror="this.style.display='none'"><div><h1>Relatório de Satisfação – SENAI MS</h1><small>Painel consolidado das pesquisas educacionais</small></div></div><div class="live">● Dados do Google Sheets</div></div></header>
+
+<main class="wrap">
+<div class="tabs">
+<button class="tab active" data-tab="aula">Aula Inaugural</button>
+<button class="tab" data-tab="satisfacao">Satisfação UC</button>
+<button class="tab" data-tab="conclusao">Conclusão de Curso</button>
+</div>
+
+<div class="toolbar">
+<div class="filters"><select id="filtroUnidade"><option value="">Todas as unidades</option></select><input id="busca" type="search" placeholder="Buscar RA, turma, unidade..."></div>
+<div><button class="action" id="atualizar">Atualizar dados</button><div class="status" id="status"></div></div>
+</div>
+
+<section class="kpis">
+<div class="kpi"><div class="label">Total de respostas</div><div class="value" id="kpiTotal">0</div></div>
+<div class="kpi orange"><div class="label" id="labelKpi2">Indicador principal</div><div class="value" id="kpi2">—</div><div class="note" id="smallKpi2"></div></div>
+<div class="kpi green"><div class="label" id="labelKpi3">Resultado positivo</div><div class="value" id="kpi3">—</div><div class="note" id="smallKpi3"></div></div>
+<div class="kpi dark"><div class="label">Unidades com respostas</div><div class="value" id="kpiUnidades">0</div></div>
+</section>
+
+<section class="charts">
+<div class="panel"><h3 id="tituloChart1">Distribuição</h3><div class="chartbox"><canvas id="chart1"></canvas></div></div>
+<div class="panel"><h3>Respostas por unidade</h3><div class="chartbox"><canvas id="chart2"></canvas></div></div>
+<div class="panel"><h3 id="tituloChart3">Distribuição complementar</h3><div class="chartbox"><canvas id="chart3"></canvas></div></div>
+</section>
+
+<section class="twocol">
+<div class="panel"><h3>Comentários / respostas abertas</h3><div id="comentarios" class="comments"></div></div>
+<div class="panel"><h3>Resumo por unidade</h3><div class="table-wrap"><table id="resumo"><thead></thead><tbody></tbody></table></div></div>
+</section>
+
+<section class="panel"><h3>Respostas detalhadas</h3><div class="table-wrap"><table id="detalhes"><thead></thead><tbody></tbody></table></div><div class="note" style="margin-top:8px">O painel lê diretamente as abas do Google Sheets. A planilha precisa estar compartilhada como “Qualquer pessoa com o link”.</div></section>
+</main>
+
+<div class="loading" id="loading"><div>Carregando dados...</div></div>
+
+<script>
+const SPREADSHEET_ID='1zuka7O17iEmu7536jpnNk3UnrGSB5yRuJBfaCj2R0Uc';
+const ABAS={aula:'Aula_Inaugural',satisfacao:'Satisfacao_UC',conclusao:'Conclusao_Curso'};
+let abaAtual='aula',dadosAtuais=[],dadosFiltrados=[],charts=[];
+
+function carregarAba(nomeAba){
+ return new Promise((resolve,reject)=>{
+  const cb='gviz_'+Date.now()+'_'+Math.floor(Math.random()*9999);
+  const s=document.createElement('script');
+  window[cb]=resp=>{
+   try{
+    if(!resp||!resp.table)throw new Error('Resposta inválida do Google Sheets.');
+    const cols=resp.table.cols.map(c=>(c.label||c.id||'').trim());
+    const rows=resp.table.rows.map(r=>{const o={};cols.forEach((c,i)=>{const cell=r.c&&r.c[i]?r.c[i]:null;o[c]=cell?(cell.f??cell.v??''):''});return o}).filter(r=>Object.values(r).some(v=>String(v).trim()));
+    resolve(rows);
+   }catch(e){reject(e)}finally{delete window[cb];s.remove()}
+  };
+  s.onerror=()=>{delete window[cb];s.remove();reject(new Error('Não foi possível acessar a planilha.'))};
+  s.src=`https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?sheet=${encodeURIComponent(nomeAba)}&tqx=out:json;responseHandler:${cb}&t=${Date.now()}`;
+  document.body.appendChild(s);
+ });
+}
+const n=v=>{const x=Number(String(v??'').replace(',','.'));return Number.isFinite(x)?x:null};
+const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+const avg=a=>{a=a.filter(v=>v!==null);return a.length?a.reduce((x,y)=>x+y,0)/a.length:NaN};
+const pct=(a,b)=>b?Math.round(a/b*100):0;
+function calcNps(a){a=a.filter(v=>v!==null);if(!a.length)return NaN;return((a.filter(v=>v>=9).length-a.filter(v=>v<=6).length)/a.length)*100}
+function countBy(field){const m={};dadosFiltrados.forEach(r=>{const v=String(r[field]??'').trim()||'Não informado';m[v]=(m[v]||0)+1});return m}
+function top(m,limit=8){return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,limit)}
+function destroyCharts(){charts.forEach(c=>{try{c.destroy()}catch(e){}});charts=[]}
+
+function preencherFiltro(){
+ const s=document.getElementById('filtroUnidade'),atual=s.value;
+ const vals=[...new Set(dadosAtuais.map(r=>String(r.Unidade??'').trim()).filter(Boolean))].sort();
+ s.innerHTML='<option value="">Todas as unidades</option>'+vals.map(v=>`<option>${esc(v)}</option>`).join('');
+ if(vals.includes(atual))s.value=atual;
+}
+function aplicarFiltros(){
+ const u=document.getElementById('filtroUnidade').value,q=document.getElementById('busca').value.toLowerCase().trim();
+ dadosFiltrados=dadosAtuais.filter(r=>(!u||String(r.Unidade??'').trim()===u)&&(!q||Object.values(r).join(' ').toLowerCase().includes(q)));
+ render();
+}
+
+function renderKpis(){
+ document.getElementById('kpiTotal').textContent=dadosFiltrados.length;
+ document.getElementById('kpiUnidades').textContent=new Set(dadosFiltrados.map(r=>r.Unidade).filter(Boolean)).size;
+ if(abaAtual==='aula'){
+  const a=dadosFiltrados.map(r=>n(r.ExpectativaCurso)).filter(v=>v!==null),m=avg(a);
+  setKpi('Expectativa média',Number.isFinite(m)?m.toFixed(1).replace('.',','):'—','Escala de 0 a 10','Expectativa alta',a.length?pct(a.filter(v=>v>=8).length,a.length)+'%':'—','Notas 8, 9 ou 10');
+ }else if(abaAtual==='satisfacao'){
+  const a=dadosFiltrados.map(r=>n(r.SatisfacaoUC)).filter(v=>v!==null),m=avg(a);
+  setKpi('Satisfação média',Number.isFinite(m)?m.toFixed(1).replace('.',','):'—','Escala de 0 a 10','Promotores',a.length?pct(a.filter(v=>v>=9).length,a.length)+'%':'—','Notas 9 e 10');
+ }else{
+  const a=dadosFiltrados.map(r=>n(r.RecomendaCurso)).filter(v=>v!==null),v=calcNps(a);
+  setKpi('NPS do curso',Number.isFinite(v)?Math.round(v):'—','Promotores − detratores','Pensou em desistir',dadosFiltrados.length?pct(dadosFiltrados.filter(r=>String(r.PensouDesistir).toLowerCase()==='sim').length,dadosFiltrados.length)+'%':'—','Percentual de respostas “Sim”');
+ }
+}
+function setKpi(l2,v2,s2,l3,v3,s3){labelKpi2.textContent=l2;kpi2.textContent=v2;smallKpi2.textContent=s2;labelKpi3.textContent=l3;kpi3.textContent=v3;smallKpi3.textContent=s3}
+
+function renderCharts(){
+ destroyCharts();
+ let field,title,color;
+ if(abaAtual==='aula'){field='ExpectativaCurso';title='Expectativa do curso (0 a 10)';color='#154593'}
+ if(abaAtual==='satisfacao'){field='SatisfacaoUC';title='Satisfação com a UC (0 a 10)';color='#ef5e31'}
+ if(abaAtual==='conclusao'){field='RecomendaCurso';title='Recomendação do curso (0 a 10)';color='#2c3e5c'}
+ tituloChart1.textContent=title;
+ const dist=Array(11).fill(0);dadosFiltrados.forEach(r=>{const v=n(r[field]);if(v!==null&&v>=0&&v<=10)dist[v]++});
+ charts.push(new Chart(chart1,{type:'bar',data:{labels:[0,1,2,3,4,5,6,7,8,9,10],datasets:[{data:dist,backgroundColor:color,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0}},x:{grid:{display:false}}}}}));
+ const un=top(countBy('Unidade'));
+ charts.push(new Chart(chart2,{type:'doughnut',data:{labels:un.map(x=>x[0]),datasets:[{data:un.map(x=>x[1])}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}}}}));
+ let f3,t3;if(abaAtual==='aula'){f3='SituacaoTrabalho';t3='Situação de trabalho'}else if(abaAtual==='satisfacao'){f3='DominioDocente';t3='Domínio do conteúdo pelo docente'}else{f3='PensouDesistir';t3='Pensou em desistir?'}
+ tituloChart3.textContent=t3;const a3=top(countBy(f3));
+ charts.push(new Chart(chart3,{type:'bar',data:{labels:a3.map(x=>x[0]),datasets:[{data:a3.map(x=>x[1]),backgroundColor:'#f2a13a',borderRadius:6}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{precision:0}},y:{grid:{display:false}}}}}));
+}
+function renderComentarios(){
+ const campos=abaAtual==='aula'?[]:abaAtual==='satisfacao'?['MelhoriaSatisfacao']:['MelhoriaUC','MelhoriaCurso','MotivoDesistencia','ContribuiuConclusao'];
+ const a=[];dadosFiltrados.forEach(r=>campos.forEach(c=>{const v=String(r[c]??'').trim();if(v)a.push({c,v,ra:r.RA,t:r.CodigoTurma})}));
+ comentarios.innerHTML=a.length?a.slice(0,100).map(x=>`<div class="comment"><strong>${esc(x.c)}</strong><br>${esc(x.v)}<div class="note">${esc(x.ra||'')} ${x.t?'• '+esc(x.t):''}</div></div>`).join(''):'<div class="empty">Nenhum comentário disponível.</div>';
+}
+function renderResumo(){
+ const m={};dadosFiltrados.forEach(r=>{const u=String(r.Unidade??'').trim()||'Não informado';(m[u]??=[]).push(r)});
+ let lab,fn;if(abaAtual==='aula'){lab='Expectativa média';fn=a=>avg(a.map(r=>n(r.ExpectativaCurso)))}else if(abaAtual==='satisfacao'){lab='Satisfação média';fn=a=>avg(a.map(r=>n(r.SatisfacaoUC)))}else{lab='NPS do curso';fn=a=>calcNps(a.map(r=>n(r.RecomendaCurso)))}
+ resumo.querySelector('thead').innerHTML=`<tr><th>Unidade</th><th>Respostas</th><th>${lab}</th></tr>`;
+ resumo.querySelector('tbody').innerHTML=Object.entries(m).sort((a,b)=>b[1].length-a[1].length).map(([u,a])=>{const v=fn(a);return`<tr><td>${esc(u)}</td><td>${a.length}</td><td>${Number.isFinite(v)?v.toFixed(1).replace('.',','):'—'}</td></tr>`}).join('');
+}
+function renderDetalhes(){
+ const pref={aula:['Timestamp','RA','CodigoTurma','Unidade','Escolaridade','RendaFamiliar','SituacaoTrabalho','ObjetivoCurso','ExperienciaArea','ComoSoube','ExpectativaCurso'],satisfacao:['Timestamp','RA','CodigoTurma','UnidadeCurricular','Unidade','SatisfacaoUC','DominioDocente','ObjetivosClaros','ConexaoMercado','ApoioDocente','MelhoriaSatisfacao'],conclusao:['Timestamp','RA','CodigoTurma','UnidadeCurricular','Unidade','RecomendaUC','DominioDocente','ObjetivosClaros','ConexaoMercado','ApoioDocente','RecomendaCurso','PensouDesistir','MotivoDesistencia','ContribuiuConclusao']}[abaAtual];
+ if(!dadosFiltrados.length){detalhes.querySelector('thead').innerHTML='';detalhes.querySelector('tbody').innerHTML='<tr><td class="empty">Nenhum registro encontrado.</td></tr>';return}
+ const cols=pref.filter(c=>c in dadosFiltrados[0]);detalhes.querySelector('thead').innerHTML='<tr>'+cols.map(c=>`<th>${esc(c)}</th>`).join('')+'</tr>';detalhes.querySelector('tbody').innerHTML=dadosFiltrados.slice(0,500).map(r=>'<tr>'+cols.map(c=>`<td>${esc(r[c])}</td>`).join('')+'</tr>').join('');
+}
+function render(){renderKpis();renderCharts();renderComentarios();renderResumo();renderDetalhes()}
+async function atualizar(){
+ loading.classList.add('show');status.textContent='Atualizando...';
+ try{dadosAtuais=await carregarAba(ABAS[abaAtual]);preencherFiltro();aplicarFiltros();status.textContent='Atualizado em '+new Date().toLocaleTimeString('pt-BR')}
+ catch(e){console.error(e);dadosAtuais=[];dadosFiltrados=[];render();status.textContent='Erro ao carregar dados';alert('Não foi possível ler a planilha. Confirme se ela está compartilhada como “Qualquer pessoa com o link”.')}
+ finally{loading.classList.remove('show')}
+}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');abaAtual=b.dataset.tab;busca.value='';filtroUnidade.value='';atualizar()});
+filtroUnidade.onchange=aplicarFiltros;busca.oninput=aplicarFiltros;atualizar.onclick=atualizar;
+atualizar();
+</script>
+</body>
+</html>
