@@ -99,7 +99,7 @@ const avg=a=>{a=a.filter(v=>v!==null);return a.length?a.reduce((x,y)=>x+y,0)/a.l
 const pct=(a,b)=>b?Math.round(a/b*100):0;
 function calcNps(a){a=a.filter(v=>v!==null);if(!a.length)return NaN;return((a.filter(v=>v>=9).length-a.filter(v=>v<=6).length)/a.length)*100}
 function countBy(field){const m={};dadosFiltrados.forEach(r=>{const v=String(r[field]??'').trim()||'Não informado';m[v]=(m[v]||0)+1});return m}
-function top(m,limit=8){return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,limit)}
+function topEntries(m,limit=8){return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,limit)}
 function destroyCharts(){charts.forEach(c=>{try{c.destroy()}catch(e){}});charts=[]}
 
 function preencherFiltro(){
@@ -128,7 +128,7 @@ function renderKpis(){
   setKpi('NPS do curso',Number.isFinite(v)?Math.round(v):'—','Promotores − detratores','Pensou em desistir',dadosFiltrados.length?pct(dadosFiltrados.filter(r=>String(r.PensouDesistir).toLowerCase()==='sim').length,dadosFiltrados.length)+'%':'—','Percentual de respostas “Sim”');
  }
 }
-function setKpi(l2,v2,s2,l3,v3,s3){labelKpi2.textContent=l2;kpi2.textContent=v2;smallKpi2.textContent=s2;labelKpi3.textContent=l3;kpi3.textContent=v3;smallKpi3.textContent=s3}
+function setKpi(l2,v2,s2,l3,v3,s3){document.getElementById('labelKpi2').textContent=l2;document.getElementById('kpi2').textContent=v2;document.getElementById('smallKpi2').textContent=s2;document.getElementById('labelKpi3').textContent=l3;document.getElementById('kpi3').textContent=v3;document.getElementById('smallKpi3').textContent=s3}
 
 function renderCharts(){
  destroyCharts();
@@ -136,40 +136,40 @@ function renderCharts(){
  if(abaAtual==='aula'){field='ExpectativaCurso';title='Expectativa do curso (0 a 10)';color='#154593'}
  if(abaAtual==='satisfacao'){field='SatisfacaoUC';title='Satisfação com a UC (0 a 10)';color='#ef5e31'}
  if(abaAtual==='conclusao'){field='RecomendaCurso';title='Recomendação do curso (0 a 10)';color='#2c3e5c'}
- tituloChart1.textContent=title;
+ document.getElementById('tituloChart1').textContent=title;
  const dist=Array(11).fill(0);dadosFiltrados.forEach(r=>{const v=n(r[field]);if(v!==null&&v>=0&&v<=10)dist[v]++});
- charts.push(new Chart(chart1,{type:'bar',data:{labels:[0,1,2,3,4,5,6,7,8,9,10],datasets:[{data:dist,backgroundColor:color,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0}},x:{grid:{display:false}}}}}));
- const un=top(countBy('Unidade'));
- charts.push(new Chart(chart2,{type:'doughnut',data:{labels:un.map(x=>x[0]),datasets:[{data:un.map(x=>x[1])}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}}}}));
+ charts.push(new Chart(document.getElementById('chart1'),{type:'bar',data:{labels:[0,1,2,3,4,5,6,7,8,9,10],datasets:[{data:dist,backgroundColor:color,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0}},x:{grid:{display:false}}}}}));
+ const un=topEntries(countBy('Unidade'));
+ charts.push(new Chart(document.getElementById('chart2'),{type:'doughnut',data:{labels:un.map(x=>x[0]),datasets:[{data:un.map(x=>x[1])}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}}}}));
  let f3,t3;if(abaAtual==='aula'){f3='SituacaoTrabalho';t3='Situação de trabalho'}else if(abaAtual==='satisfacao'){f3='DominioDocente';t3='Domínio do conteúdo pelo docente'}else{f3='PensouDesistir';t3='Pensou em desistir?'}
- tituloChart3.textContent=t3;const a3=top(countBy(f3));
- charts.push(new Chart(chart3,{type:'bar',data:{labels:a3.map(x=>x[0]),datasets:[{data:a3.map(x=>x[1]),backgroundColor:'#f2a13a',borderRadius:6}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{precision:0}},y:{grid:{display:false}}}}}));
+ document.getElementById('tituloChart3').textContent=t3;const a3=topEntries(countBy(f3));
+ charts.push(new Chart(document.getElementById('chart3'),{type:'bar',data:{labels:a3.map(x=>x[0]),datasets:[{data:a3.map(x=>x[1]),backgroundColor:'#f2a13a',borderRadius:6}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{precision:0}},y:{grid:{display:false}}}}}));
 }
 function renderComentarios(){
  const campos=abaAtual==='aula'?[]:abaAtual==='satisfacao'?['MelhoriaSatisfacao']:['MelhoriaUC','MelhoriaCurso','MotivoDesistencia','ContribuiuConclusao'];
  const a=[];dadosFiltrados.forEach(r=>campos.forEach(c=>{const v=String(r[c]??'').trim();if(v)a.push({c,v,ra:r.RA,t:r.CodigoTurma})}));
- comentarios.innerHTML=a.length?a.slice(0,100).map(x=>`<div class="comment"><strong>${esc(x.c)}</strong><br>${esc(x.v)}<div class="note">${esc(x.ra||'')} ${x.t?'• '+esc(x.t):''}</div></div>`).join(''):'<div class="empty">Nenhum comentário disponível.</div>';
+ document.getElementById('comentarios').innerHTML=a.length?a.slice(0,100).map(x=>`<div class="comment"><strong>${esc(x.c)}</strong><br>${esc(x.v)}<div class="note">${esc(x.ra||'')} ${x.t?'• '+esc(x.t):''}</div></div>`).join(''):'<div class="empty">Nenhum comentário disponível.</div>';
 }
 function renderResumo(){
  const m={};dadosFiltrados.forEach(r=>{const u=String(r.Unidade??'').trim()||'Não informado';(m[u]??=[]).push(r)});
  let lab,fn;if(abaAtual==='aula'){lab='Expectativa média';fn=a=>avg(a.map(r=>n(r.ExpectativaCurso)))}else if(abaAtual==='satisfacao'){lab='Satisfação média';fn=a=>avg(a.map(r=>n(r.SatisfacaoUC)))}else{lab='NPS do curso';fn=a=>calcNps(a.map(r=>n(r.RecomendaCurso)))}
- resumo.querySelector('thead').innerHTML=`<tr><th>Unidade</th><th>Respostas</th><th>${lab}</th></tr>`;
- resumo.querySelector('tbody').innerHTML=Object.entries(m).sort((a,b)=>b[1].length-a[1].length).map(([u,a])=>{const v=fn(a);return`<tr><td>${esc(u)}</td><td>${a.length}</td><td>${Number.isFinite(v)?v.toFixed(1).replace('.',','):'—'}</td></tr>`}).join('');
+ document.getElementById('resumo').querySelector('thead').innerHTML=`<tr><th>Unidade</th><th>Respostas</th><th>${lab}</th></tr>`;
+ document.getElementById('resumo').querySelector('tbody').innerHTML=Object.entries(m).sort((a,b)=>b[1].length-a[1].length).map(([u,a])=>{const v=fn(a);return`<tr><td>${esc(u)}</td><td>${a.length}</td><td>${Number.isFinite(v)?v.toFixed(1).replace('.',','):'—'}</td></tr>`}).join('');
 }
 function renderDetalhes(){
  const pref={aula:['Timestamp','RA','CodigoTurma','Unidade','Escolaridade','RendaFamiliar','SituacaoTrabalho','ObjetivoCurso','ExperienciaArea','ComoSoube','ExpectativaCurso'],satisfacao:['Timestamp','RA','CodigoTurma','UnidadeCurricular','Unidade','SatisfacaoUC','DominioDocente','ObjetivosClaros','ConexaoMercado','ApoioDocente','MelhoriaSatisfacao'],conclusao:['Timestamp','RA','CodigoTurma','UnidadeCurricular','Unidade','RecomendaUC','DominioDocente','ObjetivosClaros','ConexaoMercado','ApoioDocente','RecomendaCurso','PensouDesistir','MotivoDesistencia','ContribuiuConclusao']}[abaAtual];
- if(!dadosFiltrados.length){detalhes.querySelector('thead').innerHTML='';detalhes.querySelector('tbody').innerHTML='<tr><td class="empty">Nenhum registro encontrado.</td></tr>';return}
- const cols=pref.filter(c=>c in dadosFiltrados[0]);detalhes.querySelector('thead').innerHTML='<tr>'+cols.map(c=>`<th>${esc(c)}</th>`).join('')+'</tr>';detalhes.querySelector('tbody').innerHTML=dadosFiltrados.slice(0,500).map(r=>'<tr>'+cols.map(c=>`<td>${esc(r[c])}</td>`).join('')+'</tr>').join('');
+ if(!dadosFiltrados.length){document.getElementById('detalhes').querySelector('thead').innerHTML='';document.getElementById('detalhes').querySelector('tbody').innerHTML='<tr><td class="empty">Nenhum registro encontrado.</td></tr>';return}
+ const cols=pref.filter(c=>c in dadosFiltrados[0]);document.getElementById('detalhes').querySelector('thead').innerHTML='<tr>'+cols.map(c=>`<th>${esc(c)}</th>`).join('')+'</tr>';document.getElementById('detalhes').querySelector('tbody').innerHTML=dadosFiltrados.slice(0,500).map(r=>'<tr>'+cols.map(c=>`<td>${esc(r[c])}</td>`).join('')+'</tr>').join('');
 }
 function render(){renderKpis();renderCharts();renderComentarios();renderResumo();renderDetalhes()}
 async function atualizar(){
- loading.classList.add('show');status.textContent='Atualizando...';
- try{dadosAtuais=await carregarAba(ABAS[abaAtual]);preencherFiltro();aplicarFiltros();status.textContent='Atualizado em '+new Date().toLocaleTimeString('pt-BR')}
- catch(e){console.error(e);dadosAtuais=[];dadosFiltrados=[];render();status.textContent='Erro ao carregar dados';alert('Não foi possível ler a planilha. Confirme se ela está compartilhada como “Qualquer pessoa com o link”.')}
- finally{loading.classList.remove('show')}
+ document.getElementById('loading').classList.add('show');document.getElementById('status').textContent='Atualizando...';
+ try{dadosAtuais=await carregarAba(ABAS[abaAtual]);preencherFiltro();aplicarFiltros();document.getElementById('status').textContent='Atualizado em '+new Date().toLocaleTimeString('pt-BR')}
+ catch(e){console.error(e);dadosAtuais=[];dadosFiltrados=[];render();document.getElementById('status').textContent='Erro ao carregar dados';alert('Não foi possível ler a planilha. Confirme se ela está compartilhada como “Qualquer pessoa com o link”.')}
+ finally{document.getElementById('loading').classList.remove('show')}
 }
-document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');abaAtual=b.dataset.tab;busca.value='';filtroUnidade.value='';atualizar()});
-filtroUnidade.onchange=aplicarFiltros;busca.oninput=aplicarFiltros;atualizar.onclick=atualizar;
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');abaAtual=b.dataset.tab;document.getElementById('busca').value='';document.getElementById('filtroUnidade').value='';atualizar()});
+document.getElementById('filtroUnidade').onchange=aplicarFiltros;document.getElementById('busca').oninput=aplicarFiltros;document.getElementById('atualizar').onclick=atualizar;
 atualizar();
 </script>
 </body>
