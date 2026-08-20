@@ -1,22 +1,964 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pesquisa de Satisfação da Aula Inaugural – SENAI MS</title><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='27' cy='27' r='17' fill='none' stroke='%23154593' stroke-width='7'/%3E%3Cpath d='M40 40L57 57' stroke='%23ef5e31' stroke-width='8' stroke-linecap='round'/%3E%3C/svg%3E"><link rel="stylesheet" href="styles.css"></head><body class="theme-aula"><header class="top"><div class="top-inner"><div class="brand"><img class="brand-logo" src="logo-senai-fiems.png" alt="SENAI FIEMS"></div><div class="survey-badge"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg><span>Pesquisa Online</span></div></div></header><main class="wrap"><section class="card hero"><div class="hero-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg></div><div class="hero-copy"><h1>Pesquisa de Satisfação da Aula Inaugural – SENAI MS</h1><p>Bem-vindo ao SENAI MS! Antes de iniciar sua jornada, gostaríamos de conhecer um pouco sobre você.</p></div></section><form id="f" class="card">
-<div class="field"><label> Número do RA? (Registro Acadêmico) <span class="req">*</span></label><input class="input" name="ra" required></div>
-<div class="field"><label>Código da Turma? <span class="req">*</span><span class="hint">Ex.: TEC.256.PRE.001 ou QUA.366.PRE.002</span></label><input class="input" name="codigoTurma" required></div>
-<div class="field"><label>Qual sua Unidade Operacional/Escola? <span class="req">*</span><span class="hint">Se não tiver uma escola SENAI, selecione Outro e informe sua cidade.</span></label><select id="unidade" name="unidade" required><option value="">Selecione...</option></select><input id="outraUnidade" class="input" name="outraUnidade" placeholder="Informe sua cidade" style="display:none;margin-top:10px"></div>
-<div class="field"><span class="question">Qual é o seu nível de escolaridade atual? <span class="req">*</span></span><div class="options" id="escolaridade"></div></div>
-<div class="field"><span class="question">Qual é a renda mensal aproximada da sua família? <span class="req">*</span></span><div class="options" id="renda"></div></div>
-<div class="field"><span class="question">Qual é a sua situação de trabalho hoje? <span class="req">*</span></span><div class="options" id="trabalho"></div></div>
-<div class="field"><span class="question">Qual é o seu principal objetivo ao fazer este curso? <span class="req">*</span></span><div class="options" id="objetivo"></div></div>
-<div class="field"><span class="question">Você já trabalhou ou trabalha na área deste curso? <span class="req">*</span></span><div class="options" id="area"></div></div>
-<div class="field"><span class="question">Como você ficou sabendo deste curso no SENAI? <span class="req">*</span></span><div class="options" id="origem"></div></div>
-<div class="field"><span class="question">Em uma escala de 0 a 10, qual o seu nível de expectativa com este curso que está começando? <span class="req">*</span></span><div id="expectativa" class="scale"></div><div class="scale-notes"><span>Nenhuma expectativa</span><span>Expectativa altíssima</span></div></div>
-<button type="submit">Enviar pesquisa</button><div id="status" class="status"></div></form></main><div class="footer">SENAI MS • Pesquisa institucional • Melhoria contínua da experiência educacional.</div><script src="config.js?v=9"></script><script>
-const radios=(id,name,arr)=>{document.getElementById(id).innerHTML=arr.map((v,i)=>`<label class="option"><input type="radio" name="${name}" value="${v}" ${i===0?'required':''}> <span>${v}</span></label>`).join('')};
-radios('escolaridade','escolaridade',['Analfabeto','Fundamental incompleto','Fundamental completo','Ensino Médio incompleto','Ensino Médio completo','Superior incompleto','Superior completo']);
-radios('renda','renda',['Até 1 salário mínimo, até R$ 1.621,00','1 a 2 salários mínimos, de R$ 1.621,01 a R$ 3.242,00','2 a 3 salários mínimos de R$ 3.242,01 a R$ 4.863,00','3 a 5 salários mínimos de R$ 4.863,01 a R$ 8.105,00','Acima de 5 salários mínimos acima de R$ 8.105,00']);
-radios('trabalho','situacaoTrabalho',['Empregado','Desempregado','Autônomo','1° Emprego','Aposentado','Aprendiz com Contrato','Microempreendedor Individual MEI']);
-radios('objetivo','objetivoCurso',['Conseguir emprego','Crescer no emprego atual','Empreender','Obter uma certificação profissional','Outro']);
-radios('area','experienciaArea',['Sim, atualmente','Sim, já trabalhei anteriormente','Não, é uma área nova para mim']);
-radios('origem','comoSoube',['Indicação de alguém','Redes sociais','Google','Televisão ou Rádio','Empresa onde trabalho','Outro']);
-document.getElementById('expectativa').innerHTML=Array.from({length:11},(_,i)=>`<label><input type="radio" name="expectativaCurso" value="${i}" ${i===0?'required':''}>${i}</label>`).join('');
-preencherUnidades('unidade');bindOutro('unidade','outraUnidade');document.getElementById('f').addEventListener('submit',e=>{e.preventDefault();enviarFormulario(e.currentTarget,'AULA_INAUGURAL','status')});
-</script></body></html>
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1"
+>
+
+<title>
+Pesquisa de Satisfação da Aula Inaugural – SENAI MS
+</title>
+
+<link
+  rel="icon"
+  href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='27' cy='27' r='17' fill='none' stroke='%23154593' stroke-width='7'/%3E%3Cpath d='M40 40L57 57' stroke='%23ef5e31' stroke-width='8' stroke-linecap='round'/%3E%3C/svg%3E"
+>
+
+<link
+  rel="stylesheet"
+  href="styles.css"
+>
+
+</head>
+
+
+<body class="theme-aula">
+
+
+<!-- =========================================================
+     CABEÇALHO
+========================================================= -->
+
+<header class="top">
+
+<div class="top-inner">
+
+<div class="brand">
+
+<img
+  class="brand-logo"
+  src="logo-senai-fiems.png"
+  alt="SENAI FIEMS"
+>
+
+</div>
+
+
+<div class="survey-badge">
+
+<svg
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+
+<circle
+  cx="11"
+  cy="11"
+  r="7"
+></circle>
+
+<path
+  d="m20 20-3.5-3.5"
+></path>
+
+</svg>
+
+<span>
+Pesquisa Online
+</span>
+
+</div>
+
+</div>
+
+</header>
+
+
+
+<!-- =========================================================
+     CONTEÚDO
+========================================================= -->
+
+<main class="wrap">
+
+
+<!-- =========================================================
+     APRESENTAÇÃO
+========================================================= -->
+
+<section class="card hero">
+
+<div class="hero-icon">
+
+<svg
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+
+<circle
+  cx="11"
+  cy="11"
+  r="7"
+></circle>
+
+<path
+  d="m20 20-3.5-3.5"
+></path>
+
+</svg>
+
+</div>
+
+
+<div class="hero-copy">
+
+<h1>
+Pesquisa de Satisfação da Aula Inaugural – SENAI MS
+</h1>
+
+<p>
+Bem-vindo ao SENAI MS! Antes de iniciar sua jornada,
+gostaríamos de conhecer um pouco sobre você.
+</p>
+
+</div>
+
+</section>
+
+
+
+<!-- =========================================================
+     FORMULÁRIO
+========================================================= -->
+
+<form
+  id="f"
+  class="card"
+>
+
+
+<!-- =========================================================
+     RA
+========================================================= -->
+
+<div class="field">
+
+<label>
+
+Número do RA? (Registro Acadêmico)
+
+<span class="req">*</span>
+
+<span class="hint">
+Digite somente números.
+</span>
+
+</label>
+
+
+<input
+  class="input"
+  id="ra"
+  name="ra"
+  type="text"
+  inputmode="numeric"
+  autocomplete="off"
+  placeholder="Ex.: 00020279"
+  required
+>
+
+</div>
+
+
+
+<!-- =========================================================
+     CÓDIGO DA TURMA
+========================================================= -->
+
+<div class="field">
+
+<label>
+
+Código da Turma?
+
+<span class="req">*</span>
+
+<span class="hint">
+Ex.: TEC.256.PRE.001 ou QUA.366.PRE.002
+</span>
+
+</label>
+
+
+<input
+  class="input"
+  id="codigoTurma"
+  name="codigoTurma"
+  type="text"
+  maxlength="15"
+  autocomplete="off"
+  autocapitalize="characters"
+  placeholder="TEC.256.PRE.001"
+  pattern="[A-Z]{3}\.[0-9]{3}\.[A-Z]{3}\.[0-9]{3}"
+  title="Informe a turma no padrão TEC.256.PRE.001"
+  required
+>
+
+
+<span
+  id="turmaAjuda"
+  class="hint"
+  style="margin-top:7px;"
+>
+Formato obrigatório: XXX.000.XXX.000
+</span>
+
+</div>
+
+
+
+<!-- =========================================================
+     UNIDADE
+========================================================= -->
+
+<div class="field">
+
+<label>
+
+Qual sua Unidade Operacional/Escola?
+
+<span class="req">*</span>
+
+<span class="hint">
+Se não tiver uma escola SENAI, selecione Outro
+e informe sua cidade.
+</span>
+
+</label>
+
+
+<select
+  id="unidade"
+  name="unidade"
+  required
+>
+
+<option value="">
+Selecione...
+</option>
+
+</select>
+
+
+<input
+  id="outraUnidade"
+  class="input"
+  name="outraUnidade"
+  placeholder="Informe sua cidade"
+  style="display:none;margin-top:10px"
+>
+
+</div>
+
+
+
+<!-- =========================================================
+     ESCOLARIDADE
+========================================================= -->
+
+<div class="field">
+
+<span class="question">
+
+Qual é o seu nível de escolaridade atual?
+
+<span class="req">*</span>
+
+</span>
+
+<div
+  class="options"
+  id="escolaridade"
+></div>
+
+</div>
+
+
+
+<!-- =========================================================
+     RENDA
+========================================================= -->
+
+<div class="field">
+
+<span class="question">
+
+Qual é a renda mensal aproximada da sua família?
+
+<span class="req">*</span>
+
+</span>
+
+<div
+  class="options"
+  id="renda"
+></div>
+
+</div>
+
+
+
+<!-- =========================================================
+     SITUAÇÃO DE TRABALHO
+========================================================= -->
+
+<div class="field">
+
+<span class="question">
+
+Qual é a sua situação de trabalho hoje?
+
+<span class="req">*</span>
+
+</span>
+
+<div
+  class="options"
+  id="trabalho"
+></div>
+
+</div>
+
+
+
+<!-- =========================================================
+     OBJETIVO
+========================================================= -->
+
+<div class="field">
+
+<span class="question">
+
+Qual é o seu principal objetivo ao fazer este curso?
+
+<span class="req">*</span>
+
+</span>
+
+<div
+  class="options"
+  id="objetivo"
+></div>
+
+</div>
+
+
+
+<!-- =========================================================
+     EXPERIÊNCIA NA ÁREA
+========================================================= -->
+
+<div class="field">
+
+<span class="question">
+
+Você já trabalhou ou trabalha na área deste curso?
+
+<span class="req">*</span>
+
+</span>
+
+<div
+  class="options"
+  id="area"
+></div>
+
+</div>
+
+
+
+<!-- =========================================================
+     COMO FICOU SABENDO
+========================================================= -->
+
+<div class="field">
+
+<span class="question">
+
+Como você ficou sabendo deste curso no SENAI?
+
+<span class="req">*</span>
+
+</span>
+
+<div
+  class="options"
+  id="origem"
+></div>
+
+</div>
+
+
+
+<!-- =========================================================
+     EXPECTATIVA
+========================================================= -->
+
+<div class="field">
+
+<span class="question">
+
+Em uma escala de 0 a 10,
+qual o seu nível de expectativa com este curso
+que está começando?
+
+<span class="req">*</span>
+
+</span>
+
+
+<div
+  id="expectativa"
+  class="scale"
+></div>
+
+
+<div class="scale-notes">
+
+<span>
+Nenhuma expectativa
+</span>
+
+<span>
+Expectativa altíssima
+</span>
+
+</div>
+
+</div>
+
+
+
+<!-- =========================================================
+     BOTÃO
+========================================================= -->
+
+<button type="submit">
+
+Enviar pesquisa
+
+</button>
+
+
+<div
+  id="status"
+  class="status"
+></div>
+
+
+</form>
+
+</main>
+
+
+
+<!-- =========================================================
+     RODAPÉ
+========================================================= -->
+
+<div class="footer">
+
+SENAI MS • Pesquisa institucional •
+Melhoria contínua da experiência educacional.
+
+</div>
+
+
+
+<!-- =========================================================
+     CONFIG
+========================================================= -->
+
+<script src="config.js?v=10"></script>
+
+
+
+<script>
+
+
+// ============================================================
+// GERA OPÇÕES DE RADIO
+// ============================================================
+
+const radios = (
+  id,
+  name,
+  arr
+) => {
+
+  document.getElementById(id).innerHTML =
+
+    arr.map(
+      (v, i) =>
+
+        `
+
+        <label class="option">
+
+          <input
+            type="radio"
+            name="${name}"
+            value="${v}"
+            ${i === 0 ? 'required' : ''}
+          >
+
+          <span>
+            ${v}
+          </span>
+
+        </label>
+
+        `
+
+    ).join('');
+
+};
+
+
+
+// ============================================================
+// ESCOLARIDADE
+// ============================================================
+
+radios(
+  'escolaridade',
+  'escolaridade',
+  [
+    'Analfabeto',
+    'Fundamental incompleto',
+    'Fundamental completo',
+    'Ensino Médio incompleto',
+    'Ensino Médio completo',
+    'Superior incompleto',
+    'Superior completo'
+  ]
+);
+
+
+
+// ============================================================
+// RENDA
+// ============================================================
+
+radios(
+  'renda',
+  'renda',
+  [
+    'Até 1 salário mínimo, até R$ 1.621,00',
+    '1 a 2 salários mínimos, de R$ 1.621,01 a R$ 3.242,00',
+    '2 a 3 salários mínimos de R$ 3.242,01 a R$ 4.863,00',
+    '3 a 5 salários mínimos de R$ 4.863,01 a R$ 8.105,00',
+    'Acima de 5 salários mínimos acima de R$ 8.105,00'
+  ]
+);
+
+
+
+// ============================================================
+// SITUAÇÃO DE TRABALHO
+// ============================================================
+
+radios(
+  'trabalho',
+  'situacaoTrabalho',
+  [
+    'Empregado',
+    'Desempregado',
+    'Autônomo',
+    '1° Emprego',
+    'Aposentado',
+    'Aprendiz com Contrato',
+    'Microempreendedor Individual MEI'
+  ]
+);
+
+
+
+// ============================================================
+// OBJETIVO DO CURSO
+// ============================================================
+
+radios(
+  'objetivo',
+  'objetivoCurso',
+  [
+    'Conseguir emprego',
+    'Crescer no emprego atual',
+    'Empreender',
+    'Obter uma certificação profissional',
+    'Outro'
+  ]
+);
+
+
+
+// ============================================================
+// EXPERIÊNCIA NA ÁREA
+// ============================================================
+
+radios(
+  'area',
+  'experienciaArea',
+  [
+    'Sim, atualmente',
+    'Sim, já trabalhei anteriormente',
+    'Não, é uma área nova para mim'
+  ]
+);
+
+
+
+// ============================================================
+// COMO FICOU SABENDO
+// ============================================================
+
+radios(
+  'origem',
+  'comoSoube',
+  [
+    'Indicação de alguém',
+    'Redes sociais',
+    'Google',
+    'Televisão ou Rádio',
+    'Empresa onde trabalho',
+    'Outro'
+  ]
+);
+
+
+
+// ============================================================
+// ESCALA DE EXPECTATIVA
+// ============================================================
+
+document
+  .getElementById('expectativa')
+  .innerHTML =
+
+  Array
+    .from(
+      {
+        length: 11
+      },
+      (_, i) =>
+
+        `
+
+        <label>
+
+          <input
+            type="radio"
+            name="expectativaCurso"
+            value="${i}"
+            ${i === 0 ? 'required' : ''}
+          >
+
+          ${i}
+
+        </label>
+
+        `
+
+    )
+    .join('');
+
+
+
+// ============================================================
+// MÁSCARA DO RA
+// ============================================================
+
+const campoRA =
+  document.getElementById('ra');
+
+
+campoRA.addEventListener(
+  'input',
+  function () {
+
+    // Remove qualquer caractere que não seja número.
+    this.value =
+      this.value.replace(
+        /\D/g,
+        ''
+      );
+
+  }
+);
+
+
+
+// ============================================================
+// MÁSCARA DO CÓDIGO DA TURMA
+//
+// PADRÃO:
+// TEC.256.PRE.001
+//
+// 3 letras
+// 3 números
+// 3 letras
+// 3 números
+// ============================================================
+
+const campoTurma =
+  document.getElementById(
+    'codigoTurma'
+  );
+
+
+function aplicarMascaraTurma(valor) {
+
+  // Coloca tudo em maiúsculo.
+  valor =
+    valor.toUpperCase();
+
+
+  // Remove tudo que não seja letra ou número.
+  valor =
+    valor.replace(
+      /[^A-Z0-9]/g,
+      ''
+    );
+
+
+  // Limita a 12 caracteres sem os pontos:
+  //
+  // TEC256PRE001
+  //
+  valor =
+    valor.substring(
+      0,
+      12
+    );
+
+
+  let resultado = '';
+
+
+  // Primeiro bloco:
+  // TEC
+  resultado +=
+    valor.substring(
+      0,
+      3
+    );
+
+
+  // Segundo bloco:
+  // 256
+  if (valor.length > 3) {
+
+    resultado +=
+      '.' +
+      valor.substring(
+        3,
+        6
+      );
+
+  }
+
+
+  // Terceiro bloco:
+  // PRE
+  if (valor.length > 6) {
+
+    resultado +=
+      '.' +
+      valor.substring(
+        6,
+        9
+      );
+
+  }
+
+
+  // Quarto bloco:
+  // 001
+  if (valor.length > 9) {
+
+    resultado +=
+      '.' +
+      valor.substring(
+        9,
+        12
+      );
+
+  }
+
+
+  return resultado;
+
+}
+
+
+
+// ============================================================
+// APLICA MÁSCARA ENQUANTO DIGITA
+// ============================================================
+
+campoTurma.addEventListener(
+  'input',
+  function () {
+
+    this.value =
+      aplicarMascaraTurma(
+        this.value
+      );
+
+  }
+);
+
+
+
+// ============================================================
+// VALIDA FORMATO DA TURMA
+// ============================================================
+
+campoTurma.addEventListener(
+  'blur',
+  function () {
+
+    const regexTurma =
+      /^[A-Z]{3}\.[0-9]{3}\.[A-Z]{3}\.[0-9]{3}$/;
+
+
+    if (
+      this.value &&
+      !regexTurma.test(
+        this.value
+      )
+    ) {
+
+      this.setCustomValidity(
+        'Informe o Código da Turma no padrão TEC.256.PRE.001'
+      );
+
+    }
+    else {
+
+      this.setCustomValidity('');
+
+    }
+
+  }
+);
+
+
+
+// ============================================================
+// LIMPA O ERRO AO VOLTAR A DIGITAR
+// ============================================================
+
+campoTurma.addEventListener(
+  'input',
+  function () {
+
+    this.setCustomValidity('');
+
+  }
+);
+
+
+
+// ============================================================
+// UNIDADES
+// ============================================================
+
+preencherUnidades(
+  'unidade'
+);
+
+
+bindOutro(
+  'unidade',
+  'outraUnidade'
+);
+
+
+
+// ============================================================
+// ENVIO
+// ============================================================
+
+document
+  .getElementById('f')
+  .addEventListener(
+    'submit',
+    e => {
+
+      e.preventDefault();
+
+
+      // ------------------------------------------------------
+      // VALIDA NOVAMENTE O CÓDIGO DA TURMA
+      // ------------------------------------------------------
+
+      const regexTurma =
+        /^[A-Z]{3}\.[0-9]{3}\.[A-Z]{3}\.[0-9]{3}$/;
+
+
+      if (
+        !regexTurma.test(
+          campoTurma.value
+        )
+      ) {
+
+        campoTurma.setCustomValidity(
+          'Informe o Código da Turma no padrão TEC.256.PRE.001'
+        );
+
+
+        campoTurma.reportValidity();
+
+
+        campoTurma.focus();
+
+
+        return;
+
+      }
+
+
+      campoTurma.setCustomValidity('');
+
+
+      // ------------------------------------------------------
+      // ENVIA
+      // ------------------------------------------------------
+
+      enviarFormulario(
+        e.currentTarget,
+        'AULA_INAUGURAL',
+        'status'
+      );
+
+    }
+  );
+
+
+</script>
+
+</body>
+
+</html>
