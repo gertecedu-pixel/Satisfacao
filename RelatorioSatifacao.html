@@ -100,6 +100,41 @@ select,input[type=search]{
   font-size:13px;line-height:1.42
 }
 .open-item small{display:block;color:var(--muted);margin-top:4px}
+.ra-list{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:9px;
+  max-height:290px;
+  overflow:auto;
+  padding-right:2px
+}
+.ra-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  border:1px solid #e1e8f1;
+  background:linear-gradient(180deg,#ffffff,#f7f9fc);
+  border-radius:10px;
+  padding:10px 11px;
+  font-size:13px;
+  font-weight:850;
+  color:#26364f
+}
+.ra-item::before{
+  content:"RA";
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:30px;
+  height:24px;
+  padding:0 6px;
+  border-radius:7px;
+  background:rgba(21,69,147,.10);
+  color:#154593;
+  font-size:10px;
+  font-weight:900
+}
 .mini-stats{display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 10px}
 .mini-pill{
   padding:6px 9px;border-radius:999px;background:#f4f7fb;border:1px solid #e3e9f1;
@@ -194,9 +229,9 @@ const FORM_CONFIG={
   aula:{
     accent:'#154593',
     questions:[
-      {field:'RA',label:'Número do RA? (Registro Acadêmico)',type:'text-summary'},
-      {field:'CodigoTurma',label:'Código da Turma?',type:'category'},
       {field:'Unidade',label:'Qual sua Unidade Operacional/Escola?',type:'category'},
+      {field:'RA',label:'Número do RA? (Registro Acadêmico)',type:'ra-list'},
+      {field:'CodigoTurma',label:'Código da Turma?',type:'category'},
       {field:'OutraUnidade',label:'Outra Unidade / Cidade informada',type:'open'},
       {field:'Escolaridade',label:'Qual é o seu nível de escolaridade atual?',type:'category'},
       {field:'RendaFamiliar',label:'Qual é a renda mensal aproximada da sua família?',type:'category'},
@@ -210,10 +245,10 @@ const FORM_CONFIG={
   satisfacao:{
     accent:'#ef5e31',
     questions:[
+      {field:'Unidade',label:'Qual sua Unidade Operacional/Escola?',type:'category'},
       {field:'RA',label:'Número do RA? (Registro Acadêmico)',type:'text-summary'},
       {field:'CodigoTurma',label:'Código da Turma?',type:'category'},
       {field:'UnidadeCurricular',label:'Qual Unidade Curricular você está concluindo?',type:'category'},
-      {field:'Unidade',label:'Qual sua Unidade Operacional/Escola?',type:'category'},
       {field:'OutraUnidade',label:'Outra Unidade / Cidade informada',type:'open'},
       {field:'SatisfacaoUC',label:'Nível de satisfação com a Unidade Curricular',type:'scale10'},
       {field:'MelhoriaSatisfacao',label:'O que podemos melhorar para você ficar mais satisfeito?',type:'open'},
@@ -226,10 +261,10 @@ const FORM_CONFIG={
   conclusao:{
     accent:'#2c3e5c',
     questions:[
+      {field:'Unidade',label:'Qual sua Unidade Operacional/Escola?',type:'category'},
       {field:'RA',label:'Número do RA? (Registro Acadêmico)',type:'text-summary'},
       {field:'CodigoTurma',label:'Código da Turma?',type:'category'},
       {field:'UnidadeCurricular',label:'Qual Unidade Curricular você está concluindo?',type:'category'},
-      {field:'Unidade',label:'Qual sua Unidade Operacional/Escola?',type:'category'},
       {field:'OutraUnidade',label:'Outra Unidade / Cidade informada',type:'open'},
       {field:'RecomendaUC',label:'Quanto você recomendaria esta Unidade Curricular para outro aluno do SENAI?',type:'scale10'},
       {field:'MelhoriaUC',label:'O que podemos melhorar na Unidade Curricular?',type:'open'},
@@ -341,6 +376,10 @@ function createCard(q,index){
    const items=dadosFiltrados.filter(r=>norm(r[q.field])).slice(0,100);
    body=`<div class="mini-stats"><span class="mini-pill">${respostas} respostas preenchidas</span><span class="mini-pill">${taxa}% de preenchimento</span></div>
    <div class="open-list">${items.length?items.map(r=>`<div class="open-item">${esc(r[q.field])}<small>${esc(r.RA||'')} ${r.CodigoTurma?'• '+esc(r.CodigoTurma):''}</small></div>`).join(''):'<div class="empty">Sem respostas abertas.</div>'}</div>`;
+ }else if(q.type==='ra-list'){
+   const ras=[...new Set(values)].sort((a,b)=>a.localeCompare(b,'pt-BR',{numeric:true})).slice(0,500);
+   body=`<div class="mini-stats"><span class="mini-pill">${respostas} registros</span><span class="mini-pill">${ras.length} RAs distintos</span></div>
+   <div class="ra-list">${ras.length?ras.map(ra=>`<div class="ra-item"><span>${esc(ra)}</span></div>`).join(''):'<div class="empty">Nenhum RA encontrado.</div>'}</div>`;
  }else if(q.type==='text-summary'){
    const distintos=new Set(values).size;
    body=`<div class="mini-stats"><span class="mini-pill">${respostas} registros</span><span class="mini-pill">${distintos} valores distintos</span></div>
@@ -364,7 +403,7 @@ function renderQuestions(){
  grid.innerHTML=questions.map(createCard).join('');
 
  questions.forEach((q,index)=>{
-   if(q.type==='open')return;
+   if(q.type==='open' || q.type==='ra-list')return;
    const canvas=document.getElementById('qchart_'+index);
    if(!canvas)return;
 
